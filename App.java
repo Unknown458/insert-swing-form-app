@@ -791,6 +791,7 @@ submitbutoon.addActionListener(this);
 tab4.addActionListener(new ActionListener() {
     public void actionPerformed(ActionEvent e) {
         // Call resetImage() when the other button is clicked
+        
         circleImageDisplay.resetImage();
     }
 });
@@ -846,9 +847,10 @@ String def = "";
         {
                 if(ae.getSource()==submitbutoon)
                 {                                
+                    grant=1;
                     allterm();
-                        grant=1;
-                }
+                    database();
+                                        }
                 if(ae.getSource()==tab4)
                 {                                
                     clrclass();
@@ -1068,54 +1070,47 @@ String def = "";
                 try{
                     Class.forName("com.mysql.jdbc.Driver");
             Connection con=DriverManager.getConnection("jdbc:mysql://localhost:3306/weblance","root","");
-            PreparedStatement pStatement = con.prepareStatement("insert into form VALUES(?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?)");
+            PreparedStatement pStatement = con.prepareStatement("insert into insertform VALUES(?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?)");
 
-            
-            pStatement.setString(1, name);
-            pStatement.setString(2, email);
-            pStatement.setString(3, fathername);
-            pStatement.setString(4, mothername);
-            pStatement.setString(5, address);
-            pStatement.setString(6, city);
-            pStatement.setString(7, state);
-            pStatement.setString(8, pincode);
-            pStatement.setString(9, country);
-            pStatement.setString(10, regino);
-            pStatement.setString(11, rollno);
-            pStatement.setString(12, classs);
-            pStatement.setString(13, gender);
-            pStatement.setString(14, dob);
-            pStatement.setString(15, caste);
-            pStatement.setString(16, hobby);
-            pStatement.setString(17, institution);
-            pStatement.setString(18, mobno);
-            pStatement.setString(19, imageData);
+            pStatement.setInt(1,2);
+            pStatement.setString(2, name);
+            pStatement.setString(3, email);
+            pStatement.setString(4, fathername);
+            pStatement.setString(5, mothername);
+            pStatement.setString(6, address);
+            pStatement.setString(7, city);
+            pStatement.setString(8, state);
+            pStatement.setString(9, pincode);
+            pStatement.setString(10, country);
+            pStatement.setString(11, regino);
+            pStatement.setString(12, rollno);
+            pStatement.setString(13, classs);
+            pStatement.setString(14, gender);
+            pStatement.setString(15, dob);
+            pStatement.setString(16, caste);
+            pStatement.setString(17, hobby);
+            pStatement.setString(18, institution);
+            pStatement.setString(19, mobno);
+            pStatement.setString(20, imageData);
             
 
-            int choice;
+           
             if(grant==1)
             {
-                choice=JOptionPane.showConfirmDialog(null,"Do you Want Save this Record");
-                    if(choice==JOptionPane.YES_OPTION)
-                    {
+                                
+                        System.out.println("butoon clicked!!!!!!");
                         int status =pStatement.executeUpdate();   
                         if(status > 0) {
                             System.out.println("Record is inserted successfully !!!");
                          }                                           
                            JOptionPane.showMessageDialog(null," Successfully Inserted");
                            
-                    }                                       
-                    if(choice==JOptionPane.NO_OPTION)
-                    {                                               
-                        clrclass();
-                            return;
-                    }     
+                    }                 
                     else{
                         return;
                     }  
             }
-
-                } catch (Exception ex){
+                 catch (Exception ex){
                     System.out.println(ex);
                 }
             }
