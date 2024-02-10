@@ -991,130 +991,100 @@ String def = "";
                     tfinstitution.requestFocus();
                 }
                 
-                try {
-                    // Get the text from the pincode text field
-                    String mobiletext = tfmobileno.getText().trim();
+               
                     
                     // Check if the trimmed text is empty
-                    if (mobiletext.isEmpty()) {
+                    if (tfmobileno.getText().trim().isEmpty()) {
                         JOptionPane.showMessageDialog(null, " Mobile no cannot be blank!", "Note", JOptionPane.WARNING_MESSAGE);
                         tfmobileno.requestFocus();
                         return;
                     }
-                  int mobilevalue = Integer.parseInt(mobiletext);
+                 
                   
                    
-                } catch (NumberFormatException e) {
-                    JOptionPane.showMessageDialog(null, "Invalid Mobile no: " + tfmobileno.getText(), "Note", JOptionPane.WARNING_MESSAGE);
-                    tfmobileno.requestFocus();
-                    return;
-                }
-
+                
 
             }
 
 
 
-            public void stringdata(){
-                // String name = tfname.getText();
-                // String email = tfemail.getText();
-                // String fathername = tffathername.getText();
-                // String mothername = tfmothername.getText();
-                // String address = taaddress.getText();
-                // String city = tfcity.getText();
-                // String state = tfstate.getText();
-                // String pincode = tfpincode.getText();
-                // String country = (String) cbcountry.getSelectedItem();
-                // String regino = tfregino.getText();
-                // String rollno = tfrollno.getText();
-                // String classs = (String) cbclass.getSelectedItem();
-                // String gender = (String) cbsex.getSelectedItem();
-                // String dob = (String) cbdate.getSelectedItem() + "/" + (String) cbmonth.getSelectedItem() + "/" + (String) cbyear.getSelectedItem();
-                // String caste = tfcaste.getText();
-                // String hobby = tfhobby.getText();
-                // String institution = tfinstitution.getText();
-                // String mobno = tfmobileno.getText();
-                //   String imageData = circleImageDisplay.getImageData();
-                //   if (imageData != null) {
-                //     // Process the image data (e.g., store it in a database)
-                //     // Example:
-                //     storeImageDataInDatabase(imageData);
-                // } else {
-                //     // No image uploaded
-                //     // Display an error message or handle the case accordingly
-                // }
-            }
+          
  
             public void database(){
                 String name = tfname.getText();
-                String email = tfemail.getText();
-                String fathername = tffathername.getText();
-                String mothername = tfmothername.getText();
-                String address = taaddress.getText();
-                String city = tfcity.getText();
-                String state = tfstate.getText();
-                String pincode = tfpincode.getText();
-                String country = (String) cbcountry.getSelectedItem();
-                String regino = tfregino.getText();
-                String rollno = tfrollno.getText();
-                String classs = (String) cbclass.getSelectedItem();
-                String gender = (String) cbsex.getSelectedItem();
-                String dob = (String) cbdate.getSelectedItem() + "/" + (String) cbmonth.getSelectedItem() + "/" + (String) cbyear.getSelectedItem();
-                String caste = tfcaste.getText();
-                String hobby = tfhobby.getText();
-                String institution = tfinstitution.getText();
-                String mobno = tfmobileno.getText();
-                  String imageData = circleImageDisplay.getImageData();
+    String email = tfemail.getText();
+    String fathername = tffathername.getText();
+    String mothername = tfmothername.getText();
+    String address = taaddress.getText();
+    String city = tfcity.getText();
+    String state = tfstate.getText();
+    String pincode = tfpincode.getText();
+    String country = (String) cbcountry.getSelectedItem();
+    String regino = tfregino.getText();
+    String rollno = tfrollno.getText();
+    String classs = (String) cbclass.getSelectedItem();
+    String gender = (String) cbsex.getSelectedItem();
+    String dob = (String) cbdate.getSelectedItem() + "/" + (String) cbmonth.getSelectedItem() + "/" + (String) cbyear.getSelectedItem();
+    String caste = tfcaste.getText();
+    String hobby = tfhobby.getText();
+    String institution = tfinstitution.getText();
+    String mobno = tfmobileno.getText();
+    String imageData = circleImageDisplay.getImageData(); // Retrieve image data
 
 
-                try{
+                  try {
                     Class.forName("com.mysql.jdbc.Driver");
-            Connection con=DriverManager.getConnection("jdbc:mysql://localhost:3306/weblance","root","");
-            PreparedStatement pStatement = con.prepareStatement("insert into insertform VALUES(?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?)");
-
-            pStatement.setInt(1,2);
-            pStatement.setString(2, name);
-            pStatement.setString(3, email);
-            pStatement.setString(4, fathername);
-            pStatement.setString(5, mothername);
-            pStatement.setString(6, address);
-            pStatement.setString(7, city);
-            pStatement.setString(8, state);
-            pStatement.setString(9, pincode);
-            pStatement.setString(10, country);
-            pStatement.setString(11, regino);
-            pStatement.setString(12, rollno);
-            pStatement.setString(13, classs);
-            pStatement.setString(14, gender);
-            pStatement.setString(15, dob);
-            pStatement.setString(16, caste);
-            pStatement.setString(17, hobby);
-            pStatement.setString(18, institution);
-            pStatement.setString(19, mobno);
-            pStatement.setString(20, imageData);
-            
-
-           
-            if(grant==1)
-            {
-                                
-                        System.out.println("butoon clicked!!!!!!");
-                        int status =pStatement.executeUpdate();   
-                        if(status > 0) {
-                            System.out.println("Record is inserted successfully !!!");
-                         }                                           
-                           JOptionPane.showMessageDialog(null," Successfully Inserted");
-                           
-                    }                 
-                    else{
-                        return;
-                    }  
-            }
-                 catch (Exception ex){
-                    System.out.println(ex);
+                    Connection con = DriverManager.getConnection("jdbc:mysql://localhost:3306/weblance", "root", "");
+                
+                   
+                    PreparedStatement pStatement = con.prepareStatement("INSERT INTO insertform " +
+                    "(name, email, fathername, mothername, address, city, state, pincode, country, " +
+                    "regino, rollno, classs, gender, dob, caste, hobby, institution, mobno, imageData) " +
+                    "VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)");
+                
+                
+                 
+        pStatement.setString(1, name);
+        pStatement.setString(2, email);
+        pStatement.setString(3, fathername);
+        pStatement.setString(4, mothername);
+        pStatement.setString(5, address);
+        pStatement.setString(6, city);
+        pStatement.setString(7, state);
+        pStatement.setString(8, pincode);
+        pStatement.setString(9, country);
+        pStatement.setString(10, regino);
+        pStatement.setString(11, rollno);
+        pStatement.setString(12, classs);
+        pStatement.setString(13, gender);
+        pStatement.setString(14, dob);
+        pStatement.setString(15, caste);
+        pStatement.setString(16, hobby);
+        pStatement.setString(17, institution);
+        pStatement.setString(18, mobno);
+        pStatement.setString(19, imageData); // Set image data
+                
+                  
+        int choice;
+        if (grant == 1) {
+            choice = JOptionPane.showConfirmDialog(null, "Do you want to save this record?");
+            if (choice == JOptionPane.YES_OPTION) {
+                int status = pStatement.executeUpdate();
+                if (status > 0) {
+                    System.out.println("Record is inserted successfully !!!");
                 }
+                JOptionPane.showMessageDialog(null, "Successfully Inserted");
             }
-            
+            if (choice == JOptionPane.NO_OPTION) {
+                clrclass();
+                return;
+            }
+        }
+
+    } catch (Exception ex) {
+        System.out.println(ex);
+    }
+}
             
     
 
@@ -1213,13 +1183,13 @@ class CircleImageDisplay extends JPanel implements ActionListener {
         add(uploadButton);
         
         // Initialize reset button
-        // resetButton = new JButton("Reset");
-        // resetButton.addActionListener(this);
-        // resetButton.setBounds(450, 85, 80, 30); // Set bounds for the reset button
-        // resetButton.setBackground(c2);
-        // resetButton.setForeground(c5);
-        // resetButton.setBorder(BorderFactory.createLineBorder(c12));
-        // add(resetButton);
+        resetButton = new JButton("Reset");
+        resetButton.addActionListener(this);
+        resetButton.setBounds(450, 85, 80, 30); // Set bounds for the reset button
+        resetButton.setBackground(c2);
+        resetButton.setForeground(c5);
+        resetButton.setBorder(BorderFactory.createLineBorder(c12));
+        add(resetButton);
     }
 
     // Method to handle button clicks
@@ -1232,6 +1202,7 @@ class CircleImageDisplay extends JPanel implements ActionListener {
                 File selectedFile = fileChooser.getSelectedFile();
                 try {
                     uploadedImage = ImageIO.read(selectedFile);
+                    System.out.println("Image uploaded successfully."); // Debug statement
                     // Resize and crop the image to fit the circular area
                     BufferedImage resizedImage = resizeAndCropToCircle(uploadedImage);
                     // Create a circular border for the uploaded image
@@ -1298,22 +1269,23 @@ class CircleImageDisplay extends JPanel implements ActionListener {
     }
 
     // Method to get the uploaded image data as a Base64-encoded string
-    public String getImageData() {
-        if (uploadedImage != null) {
-            // Convert the uploadedImage to a byte array
-            ByteArrayOutputStream baos = new ByteArrayOutputStream();
-            try {
-                ImageIO.write(uploadedImage, "png", baos);
-            } catch (IOException e) {
-                e.printStackTrace();
-            }
-            byte[] imageData = baos.toByteArray();
-
-            // Encode the byte array as a Base64 string
-            return Base64.getEncoder().encodeToString(imageData);
+   public String getImageData() {
+    System.out.println("getImageData() called."); // Debug statement
+    if (uploadedImage != null) {
+        // Convert the uploadedImage to a byte array
+        ByteArrayOutputStream baos = new ByteArrayOutputStream();
+        try {
+            ImageIO.write(uploadedImage, "png", baos);
+        } catch (IOException e) {
+            e.printStackTrace();
         }
-        return null;
+        byte[] imageData = baos.toByteArray();
+
+        // Encode the byte array as a Base64 string
+        return Base64.getEncoder().encodeToString(imageData);
     }
+    return null;
+}
 
     // Method to create a circular image with a border
     private BufferedImage createCircularImage(BufferedImage image, int imageSize) {
