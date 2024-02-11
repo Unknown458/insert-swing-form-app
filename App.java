@@ -9,7 +9,6 @@ import javax.swing.border.*;
 import java.io.ByteArrayOutputStream;
 import java.io.File;
 import java.io.IOException;
-import java.util.Base64;
 
 import javax.swing.plaf.ColorUIResource;
 import javax.swing.plaf.metal.MetalLookAndFeel;
@@ -26,8 +25,21 @@ import javax.imageio.ImageIO;
 
 public class App extends  JPanel implements FocusListener,ActionListener{
 
-    private CircleImageDisplay circleImageDisplay; 
+    // private CircleImageDisplay circleImageDisplay; 
    
+
+    private JButton uploadButton;
+    private JButton resetButton;
+    private JButton submitButton; // New submit button
+    private JLabel imageLabel;
+    private BufferedImage defaultImage;
+    private BufferedImage uploadedImage;
+
+
+
+    
+    Color c21 = new Color(74, 0, 224, 100); // shadow box purple
+    Color c20 = new Color(197, 197, 197); // shadow box purple
 
 
     // Label,CHECKBOXS,TEXTARE
@@ -81,12 +93,69 @@ public class App extends  JPanel implements FocusListener,ActionListener{
        
 
     public App() {
-        circleImageDisplay = new CircleImageDisplay();
+        // circleImageDisplay = new CircleImageDisplay();
         // Coustom font---------------------------------------------------------------
         Font customFont = null;
         Font cf1 = null;
         Font cf3 = null;
         Font cf5 = null;
+
+
+
+
+        JPanel circlePanel = new JPanel();
+        circlePanel.setLayout(null); // Using null layout
+circlePanel.setBackground(c2);
+        // Load the default image
+        ImageIcon defaultImageIcon = new ImageIcon("camera.jpg"); // Path to your default image
+        defaultImage = loadImage("camera.jpg");
+
+        // Create a blank image with a circular border and set the default image as its content
+        int imageSize = 90; // Adjust the size of the default image and the circular border
+        BufferedImage blankImage = createCircularImage(defaultImage, imageSize);
+
+        // Initialize imageLabel with the default image
+        ImageIcon circleImageIcon = new ImageIcon(blankImage);
+        imageLabel = new JLabel(circleImageIcon);
+        imageLabel.setBounds(25, 8, imageSize, imageSize); // Set bounds for the image label
+        circlePanel.add(imageLabel);
+
+        // Initialize upload button
+        uploadButton = new JButton("Upload");
+        uploadButton.addActionListener(this);
+        uploadButton.setBounds(450, 45, 80, 30); // Set bounds for the button
+        uploadButton.setBackground(c2);
+        uploadButton.setForeground(c5);
+        uploadButton.setBorder(BorderFactory.createLineBorder(c21));
+        circlePanel.add(uploadButton);
+
+        // // Initialize reset button
+        // resetButton = new JButton("Reset");
+        // resetButton.addActionListener(this);
+        // resetButton.setBounds(450, 85, 80, 30); // Set bounds for the reset button
+        // resetButton.setBackground(c2);
+        // resetButton.setForeground(c5);
+        // resetButton.setBorder(BorderFactory.createLineBorder(c21));
+        // circlePanel.add(resetButton);
+
+        // Initialize submit button
+        submitButton = new JButton("Submit");
+        submitButton.addActionListener(this);
+        submitButton.setBounds(450, 125, 80, 30); // Set bounds for the submit button
+        submitButton.setBackground(c2);
+        submitButton.setForeground(c5);
+        submitButton.setBorder(BorderFactory.createLineBorder(c21));
+        circlePanel.add(submitButton);
+
+        
+
+
+
+
+
+
+
+
 
 try {
             // Set the look and feel to MetalLookAndFeel
@@ -235,9 +304,10 @@ try {
         mpanel.add(tp);
          
 
-        // Adding CircleImageDisplay component to innerPanel3
-        CircleImageDisplay circleImageDisplay = new CircleImageDisplay();
-        innerPanel3.add(circleImageDisplay, BorderLayout.CENTER); // Add it to the left side
+       
+
+       
+        innerPanel3.add(circlePanel, BorderLayout.CENTER); // Add it to the left side
 
         add(mpanel);
 
@@ -669,8 +739,8 @@ try {
         // add
         // ========================================================================================
 
-        circleImageDisplay.add(camera);
-        circleImageDisplay.add(camerapoint);
+        circlePanel.add(camera);
+        circlePanel.add(camerapoint);
         p.add(ntitle);
         p.add(profile);
         p.add(saveddata);
@@ -790,15 +860,169 @@ submitbutoon.addActionListener(this);
 
 tab4.addActionListener(new ActionListener() {
     public void actionPerformed(ActionEvent e) {
-        // Call resetImage() when the other button is clicked
-        
-        circleImageDisplay.resetImage();
+        // Call resetImage() of circleImageDisplay when tab4 button is clicked
+        resetImage();
     }
 });
 
 
-
     }
+
+    
+
+// Method to handle button clicks
+public void actionPerformed(ActionEvent e) {
+    System.out.println("Action performed!");
+    System.out.println("Source: " + e.getSource());
+    if (e.getSource() == uploadButton) {
+        // Handle upload button click
+        System.out.println("butonclick");
+        JFileChooser fileChooser = new JFileChooser();
+        int returnValue = fileChooser.showOpenDialog(null);
+        if (returnValue == JFileChooser.APPROVE_OPTION) {
+            File selectedFile = fileChooser.getSelectedFile();
+            try {
+                uploadedImage = ImageIO.read(selectedFile);
+                if (uploadedImage != null) {
+                    System.out.println("Image uploaded successfully."); // Debug statement
+                    // Resize and crop the image to fit the circular area
+                    BufferedImage resizedImage = resizeAndCropToCircle(uploadedImage);
+                    // Create a circular border for the uploaded image
+                    ImageIcon uploadedImageIcon = createCircularBorder(new ImageIcon(resizedImage), c20);
+                    // Update the imageLabel with the uploaded image
+                    imageLabel.setIcon(uploadedImageIcon);
+                } else {
+                    System.out.println("Failed to load uploaded image."); // Debug statement
+                }
+            } catch (IOException ex) {
+                ex.printStackTrace();
+            }
+        }
+    } else if (e.getSource() == resetButton) {
+        // Handle reset button click
+        resetImage();
+    } else if (e.getSource() == submitButton) {
+        // Handle submit button click
+        if (uploadedImage != null) {
+            byte[] imageData = getImageData();
+            if (imageData != null) {
+                // Image data is retrieved successfully, proceed with further actions
+                insertImageDataIntoDatabase(imageData);
+            } else {
+                // Error occurred while retrieving image data
+                System.out.println("Failed to retrieve image data.");
+            }
+        } else {
+            // No uploaded image found, handle this case accordingly
+            System.out.println("No uploaded image found.");
+        }
+    } else if (e.getSource() == submitbutoon) { // Assuming you meant submitButton
+        // Handle submitbutoon click
+        grant=1;
+        allterm();
+        byte[] imageData = getImageData(); // Assuming imageData is already defined
+insertImageDataIntoDatabase(imageData);
+    } else if (e.getSource() == tab4) {
+        // Handle tab4 click
+        clrclass();
+    }
+}
+
+private BufferedImage loadImage(String filename) {
+    try {
+        return ImageIO.read(new File(filename));
+    } catch (IOException e) {
+        e.printStackTrace();
+    }
+    return null;
+}
+
+
+ // Method to resize and crop the image to fit the circular area
+ private BufferedImage resizeAndCropToCircle(BufferedImage image) {
+    int imageSize = 90; // Adjust the size of the circular area
+    BufferedImage resizedImage = new BufferedImage(imageSize, imageSize, BufferedImage.TYPE_INT_ARGB);
+    Graphics2D g2d = resizedImage.createGraphics();
+    g2d.setRenderingHint(RenderingHints.KEY_ANTIALIASING, RenderingHints.VALUE_ANTIALIAS_ON);
+    Ellipse2D.Double circle = new Ellipse2D.Double(0, 0, imageSize, imageSize);
+    g2d.setClip(circle);
+    g2d.drawImage(image, 0, 0, imageSize, imageSize, null); // Draw the resized image within the circular area
+    g2d.dispose();
+    return resizedImage;
+}
+
+// Method to create a circular border for an image
+private ImageIcon createCircularBorder(ImageIcon imageIcon, Color borderColor) {
+    int imageSize = imageIcon.getIconWidth(); // Get the size of the image
+    BufferedImage image = new BufferedImage(imageSize, imageSize, BufferedImage.TYPE_INT_ARGB);
+    Graphics2D g2d = image.createGraphics();
+    g2d.setRenderingHint(RenderingHints.KEY_ANTIALIASING, RenderingHints.VALUE_ANTIALIAS_ON);
+    Ellipse2D.Double circle = new Ellipse2D.Double(0, 0, imageSize, imageSize);
+    g2d.setClip(circle);
+    imageIcon.paintIcon(null, g2d, 0, 0);
+    g2d.setColor(borderColor);
+    g2d.setStroke(new BasicStroke(2));
+    g2d.draw(circle);
+    g2d.dispose();
+    return new ImageIcon(image);
+}
+
+// Method to reset the image to the default one
+public void resetImage() {
+    // Resize and crop the default image to fit the circular area
+    BufferedImage resizedDefaultImage = resizeAndCropToCircle(defaultImage);
+    // Create a circular border for the default image
+    ImageIcon defaultImageIconWithBorder = createCircularBorder(new ImageIcon(resizedDefaultImage), c20);
+    // Update the imageLabel with the default image
+    imageLabel.setIcon(defaultImageIconWithBorder);
+}
+
+// Method to get the uploaded image data as a byte array
+public byte[] getImageData() {
+    System.out.println("getImageData() called."); // Debug statement
+    if (uploadedImage != null) {
+        try {
+            // Convert the uploadedImage to a byte array
+            ByteArrayOutputStream baos = new ByteArrayOutputStream();
+            ImageIO.write(uploadedImage, "png", baos);
+            byte[] imageData = baos.toByteArray();
+            System.out.println("Image Data Length: " + imageData.length); // Debug statement
+            return imageData;
+        } catch (IOException e) {
+            e.printStackTrace();
+            return null; // Return null if there's an exception
+        }
+    }
+    System.out.println("No uploaded image found."); // Debug statement
+    return null;
+}
+  // Method to create a circular image with a border
+  private BufferedImage createCircularImage(BufferedImage image, int imageSize) {
+    BufferedImage circularImage = new BufferedImage(imageSize, imageSize, BufferedImage.TYPE_INT_ARGB);
+    Graphics2D g2d = circularImage.createGraphics();
+    g2d.setRenderingHint(RenderingHints.KEY_ANTIALIASING, RenderingHints.VALUE_ANTIALIAS_ON);
+    Ellipse2D.Double circle = new Ellipse2D.Double(0, 0, imageSize, imageSize);
+    g2d.setClip(circle);
+    g2d.drawImage(image, 0, 0, imageSize, imageSize, null);
+    g2d.setColor(c20);
+    g2d.setStroke(new BasicStroke(2));
+    g2d.draw(circle);
+    g2d.dispose();
+    return circularImage;
+}
+
+
+
+
+
+
+
+
+
+
+
+
+
 
    
     public void focusGained(FocusEvent fe)
@@ -836,31 +1060,14 @@ String def = "";
           cbmonth.setSelectedIndex(0);
           cbsex.setSelectedIndex(0);
           cbyear.setSelectedIndex(0);
-          circleImageDisplay.resetImage();
+          resetImage();
           
 
     }
 
        
 
-    public void actionPerformed(ActionEvent ae)
-        {
-                if(ae.getSource()==submitbutoon)
-                {                                
-                    grant=1;
-                    allterm();
-                    database();
-                                        }
-                if(ae.getSource()==tab4)
-                {                                
-                    clrclass();
-                   
-                }
-            }
-
-            // JTextField tfname,tfemail,tffathername,tfmothername,tfcity,tfstate,tfpincode,tfregino,tfrollno,tfcaste,tfhobby,tfinstitution,tfmobileno;
-    // JComboBox<String> cbcountry,cbclass,cbsex,cbdate,cbmonth,cbyear;
-    //     JTextArea taaddress;  
+  
     String pincode; 
   
             public void allterm() {
@@ -1009,82 +1216,76 @@ String def = "";
 
 
           
- 
-            public void database(){
+            public void insertImageDataIntoDatabase(byte[] imageData) {
                 String name = tfname.getText();
-    String email = tfemail.getText();
-    String fathername = tffathername.getText();
-    String mothername = tfmothername.getText();
-    String address = taaddress.getText();
-    String city = tfcity.getText();
-    String state = tfstate.getText();
-    String pincode = tfpincode.getText();
-    String country = (String) cbcountry.getSelectedItem();
-    String regino = tfregino.getText();
-    String rollno = tfrollno.getText();
-    String classs = (String) cbclass.getSelectedItem();
-    String gender = (String) cbsex.getSelectedItem();
-    String dob = (String) cbdate.getSelectedItem() + "/" + (String) cbmonth.getSelectedItem() + "/" + (String) cbyear.getSelectedItem();
-    String caste = tfcaste.getText();
-    String hobby = tfhobby.getText();
-    String institution = tfinstitution.getText();
-    String mobno = tfmobileno.getText();
-    String imageData = circleImageDisplay.getImageData(); // Retrieve image data
-
-
-                  try {
+                String email = tfemail.getText();
+                String fathername = tffathername.getText();
+                String mothername = tfmothername.getText();
+                String address = taaddress.getText();
+                String city = tfcity.getText();
+                String state = tfstate.getText();
+                String pincode = tfpincode.getText();
+                String country = (String) cbcountry.getSelectedItem();
+                String regino = tfregino.getText();
+                String rollno = tfrollno.getText();
+                String classs = (String) cbclass.getSelectedItem();
+                String gender = (String) cbsex.getSelectedItem();
+                String dob = (String) cbdate.getSelectedItem() + "/" + (String) cbmonth.getSelectedItem() + "/" + (String) cbyear.getSelectedItem();
+                String caste = tfcaste.getText();
+                String hobby = tfhobby.getText();
+                String institution = tfinstitution.getText();
+                String mobno = tfmobileno.getText();
+            
+                try {
                     Class.forName("com.mysql.jdbc.Driver");
-                    Connection con = DriverManager.getConnection("jdbc:mysql://localhost:3306/weblance", "root", "");
-                
-                   
-                    PreparedStatement pStatement = con.prepareStatement("INSERT INTO insertform " +
-                    "(name, email, fathername, mothername, address, city, state, pincode, country, " +
-                    "regino, rollno, classs, gender, dob, caste, hobby, institution, mobno, imageData) " +
-                    "VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)");
-                
-                
-                 
-        pStatement.setString(1, name);
-        pStatement.setString(2, email);
-        pStatement.setString(3, fathername);
-        pStatement.setString(4, mothername);
-        pStatement.setString(5, address);
-        pStatement.setString(6, city);
-        pStatement.setString(7, state);
-        pStatement.setString(8, pincode);
-        pStatement.setString(9, country);
-        pStatement.setString(10, regino);
-        pStatement.setString(11, rollno);
-        pStatement.setString(12, classs);
-        pStatement.setString(13, gender);
-        pStatement.setString(14, dob);
-        pStatement.setString(15, caste);
-        pStatement.setString(16, hobby);
-        pStatement.setString(17, institution);
-        pStatement.setString(18, mobno);
-        pStatement.setString(19, imageData); // Set image data
-                
-                  
-        int choice;
-        if (grant == 1) {
-            choice = JOptionPane.showConfirmDialog(null, "Do you want to save this record?");
-            if (choice == JOptionPane.YES_OPTION) {
-                int status = pStatement.executeUpdate();
-                if (status > 0) {
-                    System.out.println("Record is inserted successfully !!!");
+                } catch (ClassNotFoundException ex) {
+                    ex.printStackTrace();
+                    return; // Stop further execution if driver is not found
                 }
-                JOptionPane.showMessageDialog(null, "Successfully Inserted");
+            
+                try (
+                    Connection con = DriverManager.getConnection("jdbc:mysql://localhost:3306/weblance", "root", "");
+                    PreparedStatement pStatement = con.prepareStatement("INSERT INTO forminsert (name, email, fathername, mothername, address, city, state, pincode, country, regino, rollno, classs, gender, dob, caste, hobby, institution, mobno, imageData) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)")
+                ) {
+                    pStatement.setString(1, name);
+                    pStatement.setString(2, email);
+                    pStatement.setString(3, fathername);
+                    pStatement.setString(4, mothername);
+                    pStatement.setString(5, address);
+                    pStatement.setString(6, city);
+                    pStatement.setString(7, state);
+                    pStatement.setString(8, pincode);
+                    pStatement.setString(9, country);
+                    pStatement.setString(10, regino);
+                    pStatement.setString(11, rollno);
+                    pStatement.setString(12, classs);
+                    pStatement.setString(13, gender);
+                    pStatement.setString(14, dob);
+                    pStatement.setString(15, caste);
+                    pStatement.setString(16, hobby);
+                    pStatement.setString(17, institution);
+                    pStatement.setString(18, mobno);
+            
+                    // Use the imageData passed as parameter
+                    pStatement.setBytes(19, imageData);
+            
+                    // Show confirmation dialog
+                    int choice = JOptionPane.showConfirmDialog(null, "Do you want to save this record?");
+                    if (choice == JOptionPane.YES_OPTION) {
+                        int status = pStatement.executeUpdate();
+                        if (status > 0) {
+                            System.out.println("Record is inserted successfully !!!");
+                            JOptionPane.showMessageDialog(null, "Successfully Inserted");
+                        }
+                    } else {
+                        clrclass(); // Assuming this method clears the form
+                    }
+                } catch (SQLException ex) {
+                    ex.printStackTrace();
+                    // Handle or log the exception appropriately
+                    JOptionPane.showMessageDialog(null, "Error occurred while saving the record: " + ex.getMessage(), "Error", JOptionPane.ERROR_MESSAGE);
+                }
             }
-            if (choice == JOptionPane.NO_OPTION) {
-                clrclass();
-                return;
-            }
-        }
-
-    } catch (Exception ex) {
-        System.out.println(ex);
-    }
-}
             
     
 
@@ -1141,164 +1342,3 @@ class GradientPanel extends JPanel {
     }
 }
 
-// FOR IMAGE
-// UPLOAD--------------------------------------------------------------------------------------------
-class CircleImageDisplay extends JPanel implements ActionListener {
-    private JButton uploadButton;
-    private JButton resetButton;
-    private JLabel imageLabel;
-    private BufferedImage defaultImage;
-    private BufferedImage uploadedImage;
-
-    Color c2 = new Color(255, 255, 255); // white #fff
-    Color c5 = Color.decode("#070708");// Font color black
-    Color c12 = new Color(74, 0, 224, 100); // shadow box purple
-    Color c20 = new Color(197, 197, 197); // shadow box purple
-
-    public CircleImageDisplay() {
-        setLayout(null); // Using null layout
-        setBackground(c2);
-        
-        // Load the default image
-        ImageIcon defaultImageIcon = new ImageIcon("camera.jpg"); // Path to your default image
-        defaultImage = loadImage("camera.jpg");
-
-        // Create a blank image with a circular border and set the default image as its content
-        int imageSize = 90; // Adjust the size of the default image and the circular border
-        BufferedImage blankImage = createCircularImage(defaultImage, imageSize);
-
-        // Initialize imageLabel with the default image
-        ImageIcon circleImageIcon = new ImageIcon(blankImage);
-        imageLabel = new JLabel(circleImageIcon);
-        imageLabel.setBounds(25, 8, imageSize, imageSize); // Set bounds for the image label
-        add(imageLabel);
-
-        // Initialize upload button
-        uploadButton = new JButton("Upload");
-        uploadButton.addActionListener(this);
-        uploadButton.setBounds(450, 45, 80, 30); // Set bounds for the button
-        uploadButton.setBackground(c2);
-        uploadButton.setForeground(c5);
-        uploadButton.setBorder(BorderFactory.createLineBorder(c12));
-        add(uploadButton);
-        
-        // Initialize reset button
-        resetButton = new JButton("Reset");
-        resetButton.addActionListener(this);
-        resetButton.setBounds(450, 85, 80, 30); // Set bounds for the reset button
-        resetButton.setBackground(c2);
-        resetButton.setForeground(c5);
-        resetButton.setBorder(BorderFactory.createLineBorder(c12));
-        add(resetButton);
-    }
-
-    // Method to handle button clicks
-    public void actionPerformed(ActionEvent e) {
-        if (e.getSource() == uploadButton) {
-            // Handle upload button click
-            JFileChooser fileChooser = new JFileChooser();
-            int returnValue = fileChooser.showOpenDialog(null);
-            if (returnValue == JFileChooser.APPROVE_OPTION) {
-                File selectedFile = fileChooser.getSelectedFile();
-                try {
-                    uploadedImage = ImageIO.read(selectedFile);
-                    System.out.println("Image uploaded successfully."); // Debug statement
-                    // Resize and crop the image to fit the circular area
-                    BufferedImage resizedImage = resizeAndCropToCircle(uploadedImage);
-                    // Create a circular border for the uploaded image
-                    ImageIcon uploadedImageIcon = createCircularBorder(new ImageIcon(resizedImage), c20);
-                    // Update the imageLabel with the uploaded image
-                    imageLabel.setIcon(uploadedImageIcon);
-                } catch (IOException ex) {
-                    ex.printStackTrace();
-                }
-            }
-        } else if (e.getSource() == resetButton) {
-            // Handle reset button click
-            resetImage();
-        }
-    }
-
-    // Method to load an image from file
-    private BufferedImage loadImage(String filename) {
-        try {
-            return ImageIO.read(new File(filename));
-        } catch (IOException e) {
-            e.printStackTrace();
-        }
-        return null;
-    }
-
-    // Method to resize and crop the image to fit the circular area
-    private BufferedImage resizeAndCropToCircle(BufferedImage image) {
-        int imageSize = 90; // Adjust the size of the circular area
-        BufferedImage resizedImage = new BufferedImage(imageSize, imageSize, BufferedImage.TYPE_INT_ARGB);
-        Graphics2D g2d = resizedImage.createGraphics();
-        g2d.setRenderingHint(RenderingHints.KEY_ANTIALIASING, RenderingHints.VALUE_ANTIALIAS_ON);
-        Ellipse2D.Double circle = new Ellipse2D.Double(0, 0, imageSize, imageSize);
-        g2d.setClip(circle);
-        g2d.drawImage(image, 0, 0, imageSize, imageSize, null); // Draw the resized image within the circular area
-        g2d.dispose();
-        return resizedImage;
-    }
-
-    // Method to create a circular border for an image
-    private ImageIcon createCircularBorder(ImageIcon imageIcon, Color borderColor) {
-        int imageSize = imageIcon.getIconWidth(); // Get the size of the image
-        BufferedImage image = new BufferedImage(imageSize, imageSize, BufferedImage.TYPE_INT_ARGB);
-        Graphics2D g2d = image.createGraphics();
-        g2d.setRenderingHint(RenderingHints.KEY_ANTIALIASING, RenderingHints.VALUE_ANTIALIAS_ON);
-        Ellipse2D.Double circle = new Ellipse2D.Double(0, 0, imageSize, imageSize);
-        g2d.setClip(circle);
-        imageIcon.paintIcon(null, g2d, 0, 0);
-        g2d.setColor(borderColor);
-        g2d.setStroke(new BasicStroke(2));
-        g2d.draw(circle);
-        g2d.dispose();
-        return new ImageIcon(image);
-    }
-
-    // Method to reset the image to the default one
-    public void resetImage() {
-        // Resize and crop the default image to fit the circular area
-        BufferedImage resizedDefaultImage = resizeAndCropToCircle(defaultImage);
-        // Create a circular border for the default image
-        ImageIcon defaultImageIconWithBorder = createCircularBorder(new ImageIcon(resizedDefaultImage), c20);
-        // Update the imageLabel with the default image
-        imageLabel.setIcon(defaultImageIconWithBorder);
-    }
-
-    // Method to get the uploaded image data as a Base64-encoded string
-   public String getImageData() {
-    System.out.println("getImageData() called."); // Debug statement
-    if (uploadedImage != null) {
-        // Convert the uploadedImage to a byte array
-        ByteArrayOutputStream baos = new ByteArrayOutputStream();
-        try {
-            ImageIO.write(uploadedImage, "png", baos);
-        } catch (IOException e) {
-            e.printStackTrace();
-        }
-        byte[] imageData = baos.toByteArray();
-
-        // Encode the byte array as a Base64 string
-        return Base64.getEncoder().encodeToString(imageData);
-    }
-    return null;
-}
-
-    // Method to create a circular image with a border
-    private BufferedImage createCircularImage(BufferedImage image, int imageSize) {
-        BufferedImage circularImage = new BufferedImage(imageSize, imageSize, BufferedImage.TYPE_INT_ARGB);
-        Graphics2D g2d = circularImage.createGraphics();
-        g2d.setRenderingHint(RenderingHints.KEY_ANTIALIASING, RenderingHints.VALUE_ANTIALIAS_ON);
-        Ellipse2D.Double circle = new Ellipse2D.Double(0, 0, imageSize, imageSize);
-        g2d.setClip(circle);
-        g2d.drawImage(image, 0, 0, imageSize, imageSize, null);
-        g2d.setColor(c20);
-        g2d.setStroke(new BasicStroke(2));
-        g2d.draw(circle);
-        g2d.dispose();
-        return circularImage;
-    }
-}
