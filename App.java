@@ -1107,18 +1107,29 @@ public class App extends JPanel implements FocusListener, ActionListener {
         String hobby = tfhobby.getText();
         String institution = tfinstitution.getText();
         String mobno = tfmobileno.getText();
-
+    
         try {
             Class.forName("com.mysql.jdbc.Driver");
         } catch (ClassNotFoundException ex) {
             ex.printStackTrace();
             return; // Stop further execution if driver is not found
         }
-
+    
         try (
                 Connection con = DriverManager.getConnection("jdbc:mysql://localhost:3306/weblance", "root", "");
+                PreparedStatement checkStatement = con.prepareStatement("SELECT regino FROM forminsert WHERE regino=?");
                 PreparedStatement pStatement = con.prepareStatement(
                         "INSERT INTO forminsert (name, email, fathername, mothername, address, city, state, pincode, country, regino, rollno, classs, gender, dob, caste, hobby, institution, mobno, imageData) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)")) {
+    
+            // Check if the regino already exists in the database
+            checkStatement.setString(1, regino);
+            ResultSet resultSet = checkStatement.executeQuery();
+            if (resultSet.next()) {
+                JOptionPane.showMessageDialog(null, "Record with regino " + regino + " already exists!", "Error", JOptionPane.ERROR_MESSAGE);
+                return; // Stop execution
+            }
+    
+            // Set parameters for the insert statement
             pStatement.setString(1, name);
             pStatement.setString(2, email);
             pStatement.setString(3, fathername);
@@ -1137,10 +1148,8 @@ public class App extends JPanel implements FocusListener, ActionListener {
             pStatement.setString(16, hobby);
             pStatement.setString(17, institution);
             pStatement.setString(18, mobno);
-
-            // Use the imageData passed as parameter
             pStatement.setBytes(19, imageData);
-
+    
             // Show confirmation dialog
             int choice = JOptionPane.showConfirmDialog(null, "Do you want to save this record?");
             if (choice == JOptionPane.YES_OPTION) {
@@ -1154,11 +1163,11 @@ public class App extends JPanel implements FocusListener, ActionListener {
             }
         } catch (SQLException ex) {
             ex.printStackTrace();
-            // Handle or log the exception appropriately
             JOptionPane.showMessageDialog(null, "Error occurred while saving the record: " + ex.getMessage(), "Error",
                     JOptionPane.ERROR_MESSAGE);
         }
     }
+    
 
     // run
     public static void main(String[] args) {
